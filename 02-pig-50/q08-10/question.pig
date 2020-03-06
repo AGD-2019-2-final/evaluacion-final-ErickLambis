@@ -14,3 +14,21 @@ fs -rm -f -r output;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+fs -rm -f -r data.tsv
+fs -put data.tsv
+
+u = LOAD 'data.tsv' USING PigStorage('\t')
+    AS (col1:CHARARRAY,
+        col2:BAG{t: TUPLE(p:CHARARRAY)},
+        col3:MAP[]);
+
+
+ord = FOREACH u GENERATE FLATTEN($1), FLATTEN(KEYSET($2));
+t8 = GROUP ord BY ($0,$1);
+final = FOREACH t8 GENERATE group,COUNT(ord);
+DUMP final
+
+
+STORE final INTO 'output';
+
+fs -copyToLocal output output
