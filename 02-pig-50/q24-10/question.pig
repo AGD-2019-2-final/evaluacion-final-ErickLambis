@@ -26,3 +26,16 @@ u = LOAD 'data.csv' USING PigStorage(',')
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+fs -put -f data.csv;
+data = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+        id: INT,
+        firstname: CHARARRAY,
+        lastname: CHARARRAY,
+        birthday: CHARARRAY,
+        color: CHARARRAY,
+        quantity: INT
+    );
+selected = FOREACH data GENERATE REGEX_EXTRACT(birthday, '(\\d{4})-(\\d{1,2})-(\\d{1,2})', 2);
+STORE selected INTO 'output' USING PigStorage();
+fs -get -f output/ .;
