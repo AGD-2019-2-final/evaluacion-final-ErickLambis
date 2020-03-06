@@ -27,3 +27,17 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+fs -put -f data.csv;
+data = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+        id: INT,
+        firstname: CHARARRAY,
+        lastname: CHARARRAY,
+        birthday: CHARARRAY,
+        color: CHARARRAY,
+        quantity: INT
+    );
+t26 = FOREACH data GENERATE firstname;
+filtro = FILTER t26 BY LOWER(SUBSTRING(firstname, 0, 1)) >= 'm';
+STORE filtro INTO 'output' USING PigStorage();
+fs -get -f output/ .;
