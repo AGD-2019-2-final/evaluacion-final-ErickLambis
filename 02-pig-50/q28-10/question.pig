@@ -30,3 +30,17 @@ u = LOAD 'data.csv' USING PigStorage(',')
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+fs -put -f data.csv;
+data = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+        id: INT,
+        firstname: CHARARRAY,
+        lastname: CHARARRAY,
+        birthday: CHARARRAY,
+        color: CHARARRAY,
+        quantity: INT
+    );
+t28 = FOREACH data GENERATE ToDate(birthday, 'yyyy-MM-dd') AS birthday_date;
+final = FOREACH t28 GENERATE ToString(birthday_date, 'yyyy'), ToString(birthday_date, 'yy');
+STORE final INTO 'output' USING PigStorage(',');
+fs -get -f output/ .;
