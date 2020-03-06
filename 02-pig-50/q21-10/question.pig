@@ -29,3 +29,17 @@ u = LOAD 'data.csv' USING PigStorage(',')
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
 
+--fs -put -f data.csv;
+data = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+        id: INT,
+        firstname: CHARARRAY,
+        lastname: CHARARRAY,
+        birthday: CHARARRAY,
+        color: CHARARRAY,
+        quantity: INT
+    );
+t21 = FOREACH data GENERATE firstname, color;
+filtro = FILTER t21 BY (color MATCHES 'blue|green');
+STORE filtro INTO 'output' USING PigStorage();
+--fs -get -f output/ .;
