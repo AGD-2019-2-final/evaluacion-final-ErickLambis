@@ -40,3 +40,33 @@ u = LOAD 'data.csv' USING PigStorage(',')
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+fs -put -f data.csv;
+data = LOAD 'data.csv' USING PigStorage(',')
+    AS (
+        id: INT,
+        firstname: CHARARRAY,
+        lastname: CHARARRAY,
+        birthday: CHARARRAY,
+        color: CHARARRAY,
+        quantity: INT
+    );
+t29 = FOREACH data GENERATE birthday, ToDate(birthday, 'yyyy-MM-dd') AS birthday_date;
+final = FOREACH t29 GENERATE birthday,
+                (CASE ToString(birthday_date, 'MMM')
+                    WHEN 'Jan' THEN 'ene'
+                    WHEN 'Feb' THEN 'feb'
+                    WHEN 'Mar' THEN 'mar'
+                    WHEN 'Apr' THEN 'abr'
+                    WHEN 'May' THEN 'may'
+                    WHEN 'Jun' THEN 'jun'
+                    WHEN 'Jul' THEN 'jul'
+                    WHEN 'Aug' THEN 'ago'
+                    WHEN 'Sep' THEN 'sep'
+                    WHEN 'Oct' THEN 'oct'
+                    WHEN 'Nov' THEN 'nov'
+                    WHEN 'Dec' THEN 'dic'
+                    ELSE '' END),
+                ToString(birthday_date, 'MM'), 
+                ToString(birthday_date, 'M');
+STORE final INTO 'output' USING PigStorage(',');
+fs -get -f output/ .;
